@@ -10,8 +10,8 @@ const {
   validateUpdateStatus,
   validateSearchAppointment 
 } = require('../validators/appointmentValidators');
-const asyncHandler = require('../middlewares/asyncHandler');
-const validateMiddleware = require('../middlewares/validateMiddleware');
+const asyncHandler = require('../middleware/asyncHandler');
+const validateMiddleware = require('../middleware/validateMiddleware');
 
 /**
  * @route   GET /api/appointments

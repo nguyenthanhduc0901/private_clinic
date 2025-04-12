@@ -219,8 +219,175 @@ const validateSearchMedicalRecord = (criteria) => {
     return errors;
 };
 
+/**
+ * Validate dữ liệu tạo đơn thuốc
+ * @param {Object} data Dữ liệu đơn thuốc
+ * @returns {Array} Danh sách lỗi
+ */
+const validateCreatePrescription = (data) => {
+    const errors = [];
+    const { medicine_id, usage_instruction_id, quantity, dosage } = data;
+    
+    // Kiểm tra các trường bắt buộc
+    const requiredCheck = validateRequired(
+        { medicine_id, usage_instruction_id, quantity },
+        ['medicine_id', 'usage_instruction_id', 'quantity']
+    );
+    
+    if (!requiredCheck.valid) {
+        requiredCheck.missing.forEach(field => {
+            errors.push({
+                field,
+                message: `Trường ${field} là bắt buộc`
+            });
+        });
+    }
+    
+    // Kiểm tra ID
+    if (medicine_id && !isValidNumber(medicine_id, 1)) {
+        errors.push({
+            field: 'medicine_id',
+            message: 'ID thuốc không hợp lệ'
+        });
+    }
+    
+    if (usage_instruction_id && !isValidNumber(usage_instruction_id, 1)) {
+        errors.push({
+            field: 'usage_instruction_id',
+            message: 'ID hướng dẫn sử dụng không hợp lệ'
+        });
+    }
+    
+    // Kiểm tra số lượng
+    if (quantity !== undefined) {
+        if (!isValidNumber(quantity, 1)) {
+            errors.push({
+                field: 'quantity',
+                message: 'Số lượng phải là số dương'
+            });
+        }
+    }
+    
+    return errors;
+};
+
+/**
+ * Validate dữ liệu cập nhật đơn thuốc
+ * @param {Object} data Dữ liệu đơn thuốc
+ * @returns {Array} Danh sách lỗi
+ */
+const validateUpdatePrescription = (data) => {
+    const errors = [];
+    const { medicine_id, usage_instruction_id, quantity, dosage } = data;
+    
+    // Kiểm tra ID nếu có
+    if (medicine_id !== undefined && !isValidNumber(medicine_id, 1)) {
+        errors.push({
+            field: 'medicine_id',
+            message: 'ID thuốc không hợp lệ'
+        });
+    }
+    
+    if (usage_instruction_id !== undefined && !isValidNumber(usage_instruction_id, 1)) {
+        errors.push({
+            field: 'usage_instruction_id',
+            message: 'ID hướng dẫn sử dụng không hợp lệ'
+        });
+    }
+    
+    // Kiểm tra số lượng nếu có
+    if (quantity !== undefined && !isValidNumber(quantity, 1)) {
+        errors.push({
+            field: 'quantity',
+            message: 'Số lượng phải là số dương'
+        });
+    }
+    
+    return errors;
+};
+
+/**
+ * Validate dữ liệu tạo hóa đơn
+ * @param {Object} data Dữ liệu hóa đơn
+ * @returns {Array} Danh sách lỗi
+ */
+const validateCreateInvoice = (data) => {
+    const errors = [];
+    const { 
+        examination_fee, 
+        medicine_fee, 
+        total_amount, 
+        payment_method,
+        payment_status
+    } = data;
+    
+    // Kiểm tra các trường bắt buộc
+    const requiredCheck = validateRequired(
+        { examination_fee, total_amount, payment_method },
+        ['examination_fee', 'total_amount', 'payment_method']
+    );
+    
+    if (!requiredCheck.valid) {
+        requiredCheck.missing.forEach(field => {
+            errors.push({
+                field,
+                message: `Trường ${field} là bắt buộc`
+            });
+        });
+    }
+    
+    // Kiểm tra số tiền
+    if (examination_fee !== undefined && (!Number.isFinite(Number(examination_fee)) || Number(examination_fee) < 0)) {
+        errors.push({
+            field: 'examination_fee',
+            message: 'Phí khám phải là số không âm'
+        });
+    }
+    
+    if (medicine_fee !== undefined && (!Number.isFinite(Number(medicine_fee)) || Number(medicine_fee) < 0)) {
+        errors.push({
+            field: 'medicine_fee',
+            message: 'Phí thuốc phải là số không âm'
+        });
+    }
+    
+    if (total_amount !== undefined && (!Number.isFinite(Number(total_amount)) || Number(total_amount) < 0)) {
+        errors.push({
+            field: 'total_amount',
+            message: 'Tổng tiền phải là số không âm'
+        });
+    }
+    
+    // Kiểm tra phương thức thanh toán
+    if (payment_method !== undefined) {
+        const validPaymentMethods = ['CASH', 'BANK_TRANSFER', 'CARD'];
+        if (!validPaymentMethods.includes(payment_method)) {
+            errors.push({
+                field: 'payment_method',
+                message: 'Phương thức thanh toán không hợp lệ'
+            });
+        }
+    }
+    
+    // Kiểm tra trạng thái thanh toán
+    if (payment_status !== undefined) {
+        const validPaymentStatuses = ['PAID', 'PENDING', 'CANCELLED'];
+        if (!validPaymentStatuses.includes(payment_status)) {
+            errors.push({
+                field: 'payment_status',
+                message: 'Trạng thái thanh toán không hợp lệ'
+            });
+        }
+    }
+    
+    return errors;
+};
+
 module.exports = {
     validateCreateMedicalRecord,
     validateUpdateMedicalRecord,
-    validateSearchMedicalRecord
+    validateSearchMedicalRecord,
+    validateCreatePrescription,
+    validateUpdatePrescription,
+    validateCreateInvoice
 }; 
